@@ -440,8 +440,8 @@ func (g *Gui) flush() error {
 		if v.Frame {
 			var fgColor, bgColor Attribute
 			if g.Highlight && v == g.currentView {
-				fgColor = g.SelFgColor
-				bgColor = g.SelBgColor
+				fgColor = v.SelFgColor
+				bgColor = v.SelBgColor
 			} else {
 				fgColor = g.FgColor
 				bgColor = g.BgColor

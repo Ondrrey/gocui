@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/jroimartin/gocui"
+	"github.com/ondrrey/gocui"
 )
 
 func main() {
