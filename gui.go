@@ -106,7 +106,7 @@ func (g *Gui) Size() (x, y int) {
 // the given colors.
 func (g *Gui) SetRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 	if x < 0 || y < 0 || x >= g.maxX || y >= g.maxY {
-		return errors.New("invalid point 1")
+		return errors.New("invalid point")
 	}
 	termbox.SetCell(x, y, ch, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 	return nil
@@ -116,7 +116,7 @@ func (g *Gui) SetRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 // It checks if the position is valid.
 func (g *Gui) Rune(x, y int) (rune, error) {
 	if x < 0 || y < 0 || x >= g.maxX || y >= g.maxY {
-		return ' ', errors.New("invalid point 2")
+		return ' ', errors.New("invalid point")
 	}
 	c := termbox.CellBuffer()[y*g.maxX+x]
 	return c.Ch, nil
@@ -378,7 +378,7 @@ func (g *Gui) MainLoop() error {
 				return err
 			}
 		}
-		if err := g.consumeevents(); err != nil {
+		if err := g.consumeEvents(); err != nil {
 			return err
 		}
 		if err := g.flush(); err != nil {
@@ -387,8 +387,8 @@ func (g *Gui) MainLoop() error {
 	}
 }
 
-// consumeevents handles the remaining events in the events pool.
-func (g *Gui) consumeevents() error {
+// consumeEvents handles the remaining events in the events pool.
+func (g *Gui) consumeEvents() error {
 	for {
 		select {
 		case ev := <-g.tbEvents:

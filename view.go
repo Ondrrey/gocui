@@ -169,7 +169,7 @@ func (v *View) setRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 func (v *View) SetCursor(x, y int) error {
 	maxX, maxY := v.Size()
 	if x < 0 || x >= maxX || y < 0 || y >= maxY {
-		return errors.New("invalid point 4")
+		return errors.New("invalid point")
 	}
 	v.cx = x
 	v.cy = y
@@ -188,7 +188,7 @@ func (v *View) Cursor() (x, y int) {
 // or decrementing ox and oy.
 func (v *View) SetOrigin(x, y int) error {
 	if x < 0 || y < 0 {
-		return errors.New("invalid point 5")
+		return errors.New("invalid point")
 	}
 	v.ox = x
 	v.oy = y
@@ -377,7 +377,7 @@ func (v *View) realPosition(vx, vy int) (x, y int, err error) {
 	vy = v.oy + vy
 
 	if vx < 0 || vy < 0 {
-		return 0, 0, errors.New("invalid point 6")
+		return 0, 0, errors.New("invalid point")
 	}
 
 	if len(v.viewLines) == 0 {
@@ -475,7 +475,7 @@ func (v *View) Line(y int) (string, error) {
 	}
 
 	if y < 0 || y >= len(v.lines) {
-		return "", errors.New("invalid point 7")
+		return "", errors.New("invalid point")
 	}
 
 	return lineType(v.lines[y]).String(), nil
@@ -490,7 +490,7 @@ func (v *View) Word(x, y int) (string, error) {
 	}
 
 	if x < 0 || y < 0 || y >= len(v.lines) || x >= len(v.lines[y]) {
-		return "", errors.New("invalid point 8")
+		return "", errors.New("invalid point")
 	}
 
 	str := lineType(v.lines[y]).String()
