@@ -106,7 +106,7 @@ func (g *Gui) Size() (x, y int) {
 // the given colors.
 func (g *Gui) SetRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 	if x < 0 || y < 0 || x >= g.maxX || y >= g.maxY {
-		return errors.New("invalid point")
+		return errors.New("invalid point 1")
 	}
 	termbox.SetCell(x, y, ch, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 	return nil
@@ -116,7 +116,7 @@ func (g *Gui) SetRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 // It checks if the position is valid.
 func (g *Gui) Rune(x, y int) (rune, error) {
 	if x < 0 || y < 0 || x >= g.maxX || y >= g.maxY {
-		return ' ', errors.New("invalid point")
+		return ' ', errors.New("invalid point 2")
 	}
 	c := termbox.CellBuffer()[y*g.maxX+x]
 	return c.Ch, nil
@@ -443,8 +443,8 @@ func (g *Gui) flush() error {
 				fgColor = v.SelFgColor
 				bgColor = v.SelBgColor
 			} else {
-				fgColor = g.FgColor
-				bgColor = g.BgColor
+				fgColor = v.FgColor
+				bgColor = v.BgColor
 			}
 
 			if err := g.drawFrameEdges(v, fgColor, bgColor); err != nil {
@@ -474,32 +474,33 @@ func (g *Gui) drawFrameEdges(v *View, fgColor, bgColor Attribute) error {
 		runeH, runeV = '-', '|'
 	}
 
-	for x := v.x0 + 1; x < v.x1 && x < g.maxX; x++ {
+	for x := v.x0 + 1; x < v.x1-1 && x < g.maxX; x++ {
 		if x < 0 {
 			continue
 		}
-		if v.y0 > -1 && v.y0 < g.maxY {
+		if v.y0 > -1 && v.y0 <= g.maxY {
 			if err := g.SetRune(x, v.y0, runeH, fgColor, bgColor); err != nil {
 				return err
 			}
 		}
-		if v.y1 > -1 && v.y1 < g.maxY {
-			if err := g.SetRune(x, v.y1, runeH, fgColor, bgColor); err != nil {
+		if v.y1 > -1 && v.y1 <= g.maxY {
+			if err := g.SetRune(x, v.y1-1, runeH, fgColor, bgColor); err != nil {
 				return err
 			}
 		}
 	}
-	for y := v.y0 + 1; y < v.y1 && y < g.maxY; y++ {
+
+	for y := v.y0 + 1; y < v.y1-1 && y < g.maxY; y++ {
 		if y < 0 {
 			continue
 		}
-		if v.x0 > -1 && v.x0 < g.maxX {
+		if v.x0 > -1 && v.x0 <= g.maxX {
 			if err := g.SetRune(v.x0, y, runeV, fgColor, bgColor); err != nil {
 				return err
 			}
 		}
-		if v.x1 > -1 && v.x1 < g.maxX {
-			if err := g.SetRune(v.x1, y, runeV, fgColor, bgColor); err != nil {
+		if v.x1 > -1 && v.x1 <= g.maxX {
+			if err := g.SetRune(v.x1-1, y, runeV, fgColor, bgColor); err != nil {
 				return err
 			}
 		}
@@ -517,7 +518,7 @@ func (g *Gui) drawFrameCorners(v *View, fgColor, bgColor Attribute) error {
 	corners := []struct {
 		x, y int
 		ch   rune
-	}{{v.x0, v.y0, runeTL}, {v.x1, v.y0, runeTR}, {v.x0, v.y1, runeBL}, {v.x1, v.y1, runeBR}}
+	}{{v.x0, v.y0, runeTL}, {v.x1 - 1, v.y0, runeTR}, {v.x0, v.y1 - 1, runeBL}, {v.x1 - 1, v.y1 - 1, runeBR}}
 
 	for _, c := range corners {
 		if c.x >= 0 && c.y >= 0 && c.x < g.maxX && c.y < g.maxY {

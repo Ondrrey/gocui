@@ -125,7 +125,7 @@ func (v *View) Name() string {
 // it checks if the position is valid.
 func (v *View) setRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 	maxX, maxY := v.Size()
-	if x < 0 || x >= maxX || y < 0 || y >= maxY {
+	if x < 0 || x > maxX || y < 0 || y > maxY {
 		return errors.New("invalid point")
 	}
 
@@ -153,7 +153,12 @@ func (v *View) setRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 		bgColor = v.SelBgColor
 	}
 
-	termbox.SetCell(v.x0+x+1, v.y0+y+1, ch,
+	offset := 0
+	if v.Frame {
+		offset = 1
+	}
+
+	termbox.SetCell(v.x0+x+offset, v.y0+y+offset, ch,
 		termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 
 	return nil
@@ -164,7 +169,7 @@ func (v *View) setRune(x, y int, ch rune, fgColor, bgColor Attribute) error {
 func (v *View) SetCursor(x, y int) error {
 	maxX, maxY := v.Size()
 	if x < 0 || x >= maxX || y < 0 || y >= maxY {
-		return errors.New("invalid point")
+		return errors.New("invalid point 4")
 	}
 	v.cx = x
 	v.cy = y
@@ -183,7 +188,7 @@ func (v *View) Cursor() (x, y int) {
 // or decrementing ox and oy.
 func (v *View) SetOrigin(x, y int) error {
 	if x < 0 || y < 0 {
-		return errors.New("invalid point")
+		return errors.New("invalid point 5")
 	}
 	v.ox = x
 	v.oy = y
@@ -288,9 +293,14 @@ func (v *View) Rewind() {
 func (v *View) draw() error {
 	maxX, maxY := v.Size()
 
+	offset := 0
+	if v.Frame {
+		offset = 1
+	}
+
 	if v.Wrap {
 		if maxX == 0 {
-			return errors.New("X size of the view cannot be 0")
+			return errors.New("x size of the view cannot be 0")
 		}
 		v.ox = 0
 	}
@@ -329,7 +339,7 @@ func (v *View) draw() error {
 		if i < v.oy {
 			continue
 		}
-		if y >= maxY {
+		if y+offset*2 > maxY {
 			break
 		}
 		x := 0
@@ -337,7 +347,7 @@ func (v *View) draw() error {
 			if j < v.ox {
 				continue
 			}
-			if x >= maxX {
+			if x+offset*2 > maxX {
 				break
 			}
 
@@ -367,7 +377,7 @@ func (v *View) realPosition(vx, vy int) (x, y int, err error) {
 	vy = v.oy + vy
 
 	if vx < 0 || vy < 0 {
-		return 0, 0, errors.New("invalid point")
+		return 0, 0, errors.New("invalid point 6")
 	}
 
 	if len(v.viewLines) == 0 {
@@ -397,12 +407,16 @@ func (v *View) Clear() {
 	v.clearRunes()
 }
 
-// clearRunes erases all the cells in the view.
+// clearRunes erases all the cells in the view, except frame and title.
 func (v *View) clearRunes() {
 	maxX, maxY := v.Size()
-	for x := 0; x < maxX; x++ {
-		for y := 0; y < maxY; y++ {
-			termbox.SetCell(v.x0+x+1, v.y0+y+1, ' ',
+	offset := 0
+	if v.Frame {
+		offset = 1
+	}
+	for x := offset; x <= maxX-offset; x++ {
+		for y := offset; y <= maxY-offset; y++ {
+			termbox.SetCell(v.x0+x, v.y0+y, ' ',
 				termbox.Attribute(v.FgColor), termbox.Attribute(v.BgColor))
 		}
 	}
@@ -461,7 +475,7 @@ func (v *View) Line(y int) (string, error) {
 	}
 
 	if y < 0 || y >= len(v.lines) {
-		return "", errors.New("invalid point")
+		return "", errors.New("invalid point 7")
 	}
 
 	return lineType(v.lines[y]).String(), nil
@@ -476,7 +490,7 @@ func (v *View) Word(x, y int) (string, error) {
 	}
 
 	if x < 0 || y < 0 || y >= len(v.lines) || x >= len(v.lines[y]) {
-		return "", errors.New("invalid point")
+		return "", errors.New("invalid point 8")
 	}
 
 	str := lineType(v.lines[y]).String()
